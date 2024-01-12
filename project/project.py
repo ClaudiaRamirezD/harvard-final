@@ -1,6 +1,6 @@
 import requests
 
-WIDTH = 80
+WIDTH = 60
 FILL = '-'
 FILL2 = ' '
 
