@@ -5,17 +5,17 @@ FILL = '-'
 FILL2 = ' '
 
 def main():
-    location = get_user_location()
+    location = get_user_location(input)
     if location:
         suggest_places(location)
 
-def get_user_location():
+def get_user_location(input_func):
     key = "poRCTPjPwMPoNKjUOVrAYYjN4LQkLwfm"
     base_url = "https://www.mapquestapi.com/geocoding/v1/address?key="
 
     while True:
         print(FILL * WIDTH)
-        valid_location = input("Enter a valid location to explore! 🌎 : ")
+        valid_location = input_func("Enter a valid location to explore! 🌎 : ")
         print(FILL * WIDTH)
         if validate_location(valid_location):
             main_url = f"{base_url}{key}&location={valid_location}"
