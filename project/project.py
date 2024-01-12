@@ -1,5 +1,9 @@
 import requests
 
+WIDTH = 80
+FILL = '-'
+FILL2 = ' '
+
 def main():
     location = get_user_location()
     if location:
@@ -10,11 +14,14 @@ def get_user_location():
     base_url = "https://www.mapquestapi.com/geocoding/v1/address?key="
 
     while True:
-        valid_location = input("Enter a valid location to explore!: ")
+        print(FILL * WIDTH)
+        valid_location = input("Enter a valid location to explore! 🌎 : ")
+        print(FILL * WIDTH)
         if validate_location(valid_location):
             main_url = f"{base_url}{key}&location={valid_location}"
-            r = requests.get(main_url)
-            if r.status_code == 200:
+            try:
+                r = requests.get(main_url)
+                r.raise_for_status()
                 data = r.json()["results"][0]["locations"][0]
                 city = data["adminArea4"]
                 state = data["adminArea3"]
@@ -23,29 +30,34 @@ def get_user_location():
                 lat = data["latLng"]["lat"]
                 lon = data["latLng"]["lng"]
         
-                print("Your location is: ")
-                print("City: ",city)
+                print("Your location is: ".center(WIDTH, FILL2))
+                print("City: ", city)
                 print("State: ", state)
                 print("Country: ", country)
                 print("Zip: ", zipcode)
                 print("Latitude: ", lat)
                 print("Longitude: ", lon)
-                return {
-                    "city": city,
-                    "state": state,
-                    "country": country,
-                    "zipcode": zipcode,
-                    "latitude": lat,
-                    "longitude": lon
-                }
-            else:
-                print("Invalid location, please try again")
+                print(FILL * WIDTH)
+
+                confirm = input("Is this information correct? (y/n): ").lower().strip()
+                print(FILL * WIDTH)
+                if confirm == "y":
+                    return {
+                        "city": city,
+                        "state": state,
+                        "country": country,
+                        "zipcode": zipcode,
+                        "latitude": lat,
+                        "longitude": lon
+                    }
+            except requests.exceptions.RequestException as e:
+                print(f"Error fetching location details: {e}")
+                print("Please try again.")
         else:
             print("Invalid location, please try again")
 
 def validate_location(valid_location):
     return bool(valid_location)
-
 
 def suggest_places(location):
     key = "poRCTPjPwMPoNKjUOVrAYYjN4LQkLwfm"
@@ -58,7 +70,6 @@ def suggest_places(location):
         "ambiguities": "ignore",
         "outFormat": "json"
     }
-
 
     params = {
         "key": key,
@@ -74,7 +85,8 @@ def suggest_places(location):
         response = r.json()
         places = response.get("searchResults", [])
         if places:
-            print(f"Here are some places you might like in real driving kms 🚗:")
+            print(f"Here are some places you might like in real driving kms 🚗 :")
+            print(FILL * WIDTH)
             for place in places:
                 distance = round(place['distance'], 2)
                 print(f"{place['name']} - {distance} kms")
@@ -82,7 +94,6 @@ def suggest_places(location):
             print(f"No places near you were found!")
     except requests.exceptions.RequestException as e:
         print(f"Error fetching places: {e}")
-
 
 if __name__ == "__main__":
     main()
